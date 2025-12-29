@@ -47,7 +47,7 @@
   
 --- 
 > **PAIRING LINK 1 🖇️**
-  <a href='https://adeelxmd-pair.onrender.com' target="_blank">
+  <a href='https://mafiamd-fea7d054563a.herokuapp.com/pair' target="_blank">
     <img src='https://img.shields.io/badge/PAIR_CODE_1-00FFFF?style=for-the-badge&logo=matrix&logoColor=red&labelColor=000000'/>
   </a></br>
   
