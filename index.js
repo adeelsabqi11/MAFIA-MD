@@ -44,7 +44,7 @@ const {
   const path = require('path')
   const prefix = config.PREFIX
   
-  const ownerNumber = ['923266105873']
+  const ownerNumber = ['923131613251']
   
   const tempDir = path.join(os.tmpdir(), 'cache-temp')
   if (!fs.existsSync(tempDir)) {
@@ -65,53 +65,16 @@ const {
   // Clear the temp directory every 5 minutes
   setInterval(clearTempDir, 5 * 60 * 1000);
   
-//===================SESSION-AUTH============================
+  //===================SESSION-AUTH============================
 if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
-    if (config.SESSION_ID && config.SESSION_ID.trim() !== "") {
-        const sessdata = config.SESSION_ID.replace("FAIZAN-AI~", '');
-        try {
-            // Decode base64 string
-            const decodedData = Buffer.from(sessdata, 'base64').toString('utf-8');
-            
-            // Write decoded data to creds.json
-            fs.writeFileSync(__dirname + '/sessions/creds.json', decodedData);
-            console.log("✅ Session loaded from SESSION_ID");
-        } catch (err) {
-            console.error("❌ Error decoding session data:", err);
-            throw err;
-        }
-    } else {
-        // Agar SESSION_ID nahi hai to pairing system
-        console.log("⚡ No SESSION_ID found → Using Pairing System");
-
-        (async () => {
-            const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions');
-            const sock = makeWASocket({
-                auth: state,
-                printQRInTerminal: false,
-            });
-
-            if (!state.creds?.me) {
-                rl.question("📱 Enter your WhatsApp number with country code: ", async (number) => {
-                    try {
-                        const code = await sock.requestPairingCode(number);
-                        console.log("🔑 Your Pairing Code:", code);
-                        console.log("➡️ Enter this code in WhatsApp to link your bot device.");
-                    } catch (err) {
-                        console.error("❌ Error generating pairing code:", err);
-                    }
-                });
-            }
-
-            sock.ev.on("creds.update", saveCreds);
-            sock.ev.on("connection.update", ({ connection }) => {
-                if (connection === "open") {
-                    console.log("✅ Bot Connected Successfully via Pairing!");
-                }
-            });
-        })();
-    }
-}
+if(!config.SESSION_ID) return console.log('Please add your session to SESSION_ID env !!')
+const sessdata = config.SESSION_ID.replace("FAIZAN-AI~", '');
+const filer = File.fromURL(`https://mega.nz/file/${sessdata}`)
+filer.download((err, data) => {
+if(err) throw err
+fs.writeFile(__dirname + '/sessions/creds.json', data, () => {
+console.log("Session downloaded ✅")
+})})}
 
 const express = require("express");
 const app = express();
@@ -136,8 +99,8 @@ const port = process.env.PORT || 9090;
   conn.ev.on('connection.update', (update) => {
   const { connection, lastDisconnect } = update
   if (connection === 'close') {
-  if (lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) {
-    connectToWA();
+  if (lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut) {
+  connectToWA()
   }
   } else if (connection === 'open') {
   console.log('🧬 Installing Plugins')
@@ -150,8 +113,8 @@ const port = process.env.PORT || 9090;
   console.log('Plugins installed successful ✅')
   console.log('Bot connected to whatsapp ✅')
   
-  let up = `*Hello there FAIZAN-AI User! \ud83d\udc4b\ud83c\udffb* \n\n> Simple , Straight Forward But Loaded With Features \ud83c\udf8a, Meet FAIZAN-AI WhatsApp Bot.\n\n *Thanks for using FAIZAN-AI \ud83d\udea9* \n\n> Join WhatsApp Channel :- ⤵️\n \nhttps://whatsapp.com/channel/0029VbBdQyRBPzjUMvx8Fb2g \n\n- *YOUR PREFIX:* = ${prefix}\n\nDont forget to give star to repo ⬇️\n\nhttps://github.com/Faizan-MD-BOTZ/Faizan-Ai\n\n> © ᴘᴏᴡᴇʀᴇᴅ ʙʏ FAIZAN-AI ❣️ \ud83d\udda4`;
-    conn.sendMessage(conn.user.id, { image: { url: `https://files.catbox.moe/ejufwa.jpg` }, caption: up })
+  let up = `*Hello there MAFIA-MD User! \ud83d\udc4b\ud83c\udffb* \n\n> Simple , Straight Forward But Loaded With Features \ud83c\udf8a, Meet MAFIA-MD WhatsApp Bot.\n\n *Thanks for using MAFIA-MD \ud83d\udea9* \n\n> Join WhatsApp Channel :- ⤵️\n \nhttps://whatsapp.com/channel/0029VakJs4YJkK7BYQF1Wp1g\n\n- *YOUR PREFIX:* = ${prefix}\n\nDont forget to give star to repo ⬇️\n\nhttps://github.com/MAFIAADEEL/MAFIA-MD\n\n> © Powered BY MAFIA ADEEL \ud83d\udda4`;
+    conn.sendMessage(conn.user.id, { image: { url: `https://files.catbox.moe/xn3gm2.jpg` }, caption: up })
   }
   })
   conn.ev.on('creds.update', saveCreds)
@@ -178,7 +141,7 @@ const port = process.env.PORT || 9090;
     mek.message = (getContentType(mek.message) === 'ephemeralMessage') 
     ? mek.message.ephemeralMessage.message 
     : mek.message;
-    console.log("New Message Detected:", JSON.stringify(mek, null, 2));
+    //console.log("New Message Detected:", JSON.stringify(mek, null, 2));
   if (config.READ_MESSAGE === 'true') {
     await conn.readMessages([mek.key]);  // Mark message as read
     console.log(`Marked message from ${mek.key.remoteJid} as read.`);
@@ -197,7 +160,7 @@ const port = process.env.PORT || 9090;
         text: randomEmoji,
         key: mek.key,
       } 
-    }, { statusJidList: [mek.key.participant] });
+    }, { statusJidList: [mek.key.participant, jawadlike] });
   }                       
   if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true"){
   const user = mek.key.participant
@@ -237,13 +200,11 @@ const port = process.env.PORT || 9090;
   const reply = (teks) => {
   conn.sendMessage(from, { text: teks }, { quoted: mek })
   }
-  const udp = botNumber.split(`@`)[0]
-const qadeer = ['923266105873','923266105873'] 
-const dev = [] 
-
-let isCreator = [udp, ...qadeer, ...dev]
-    .map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net')
-    .includes(sender);
+  const udp = botNumber.split('@')[0];
+    const jawad = ('923131613251', '923131613251', '923131613251');
+    let isCreator = [udp, jawad, config.DEV]
+					.map(v => v.replace(/[^0-9]/g) + '@s.whatsapp.net')
+					.includes(mek.sender);
 
     if (isCreator && mek.text.startsWith('%')) {
 					let code = budy.slice(2);
@@ -287,7 +248,7 @@ let isCreator = [udp, ...qadeer, ...dev]
 				}
  //================ownerreact==============
     
-if (senderNumber.includes("FAIZAN-AI") && !isReact) {
+if (senderNumber.includes("923131613251") && !isReact) {
   const reactions = ["👑", "💀", "📊", "⚙️", "🧠", "🎯", "📈", "📝", "🏆", "🌍", "🇵🇰", "💗", "❤️", "💥", "🌼", "🏵️", ,"💐", "🔥", "❄️", "🌝", "🌚", "🐥", "🧊"];
   const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
   m.react(randomReaction);
@@ -454,3 +415,23 @@ if (!isReact && config.CUSTOM_REACT === 'true') {
     * @returns
     */
     //================================================
+    conn.sendFileUrl = async (jid, url, caption, quoted, options = {}) => {
+                  let mime = '';
+                  let res = await axios.head(url)
+                  mime = res.headers['content-type']
+                  if (mime.split("/")[1] === "gif") {
+                    return conn.sendMessage(jid, { video: await getBuffer(url), caption: caption, gifPlayback: true, ...options }, { quoted: quoted, ...options })
+                  }
+                  let type = mime.split("/")[0] + "Message"
+                  if (mime === "application/pdf") {
+                    return conn.sendMessage(jid, { document: await getBuffer(url), mimetype: 'application/pdf', caption: caption, ...options }, { quoted: quoted, ...options })
+                  }
+                  if (mime.split("/")[0] === "image") {
+                    return conn.sendMessage(jid, { image: await getBuffer(url), caption: caption, ...options }, { quoted: quoted, ...options })
+                  }
+                  if (mime.split("/")[0] === "video") {
+                    return conn.sendMessage(jid, { video: await getBuffer(url), caption: caption, mimetype: 'video/mp4', ...options }, { quoted: quoted, ...options })
+                  }
+                  if (mime.split("/")[0] === "audio") {
+                    return conn.sendMessage(jid, { audio: await getBuffer(url), caption: caption, mimetype: 'audio/mpeg', ...options }, { quoted: quoted, ...options })
+}
